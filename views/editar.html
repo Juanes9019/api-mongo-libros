@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proveedores</title>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+</head>
+<body>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Ubicación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="proveedoresTableBody">
+      <!-- The buttons will be generated here -->
+    </tbody>
+  </table>
+  
+  <h2>Editar Proveedor</h2>
+  <form id="editarProveedorForm" style="display: block;">
+    <input type="hidden" id="edit-id_proveedor">
+    <label for="edit-nombre">Nombre:</label>
+    <input type="text" id="edit-nombre" required>
+    <label for="edit-telefono">Teléfono:</label>
+    <input type="tel" id="edit-telefono" required>
+    <label for="edit-email">Email:</label>
+    <input type="email" id="edit-email" required>
+    <label for="edit-ubicacion">Ubicación:</label>
+    <input type="text" id="edit-ubicacion" required>
+    <button type="submit">Actualizar Proveedor</button>
+  </form>
+  <div id="editarProveedorResponse"></div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch('https://api-mongo-proveedores.onrender.com/api/proveedores')
+        .then(response => response.json())
+        .then(data => {
+          const proveedores = data.proveedores;
+          const tableBody = document.getElementById("proveedoresTableBody");
+          const editForm = document.getElementById("editarProveedorForm");
+  
+          proveedores.forEach(proveedor => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${proveedor.id_proveedor}</td>
+              <td>${proveedor.nombre}</td>
+              <td>${proveedor.telefono}</td>
+              <td>${proveedor.email}</td>
+              <td>${proveedor.ubicacion}</td>
+              <td>
+                <button id="editar" class="edit-btn" data-id="${proveedor.id_proveedor}">Editar</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+  
+          // Add event listener for edit buttons
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.dataset.id;
+              const selectedProvider = proveedores.find(p => p.id_proveedor === id);
+  
+              // Fill in the form fields with the selected provider's data
+              editForm.querySelector('#edit-id_proveedor').value = selectedProvider.id_proveedor;
+              editForm.querySelector('#edit-nombre').value = selectedProvider.nombre;
+              editForm.querySelector('#edit-telefono').value = selectedProvider.telefono;
+              editForm.querySelector('#edit-email').value = selectedProvider.email;
+              editForm.querySelector('#edit-ubicacion').value = selectedProvider.ubicacion;
+  
+              // Show the form
+              editForm.style.display = 'block';
+            });
+          });
+        });
+    });
+  </script>
+
+</body>
+</html>
